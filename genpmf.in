@@ -1,0 +1,52 @@
+
+# Init #
+dimension   3
+boundary    p p p 
+units       real
+atom_style  atomic
+
+# Atom Definition #
+read_data ${input_data}
+
+# Settings #
+pair_style table spline 9941
+
+pair_coeff 1 1 N20.txt DE_GNP 75.6
+pair_coeff 2 2 N100.txt DE_GNP 115.92
+pair_coeff 1 2 mixed_potential.txt DE_GNP 95.66
+
+# Neighbor list calc frequency #
+neigh_modify delay 0 every 1 check yes 
+
+# Saving frequency #
+variable ts_save equal floor(${steps_gen}*0.01)
+
+# Dump #
+dump 1 all custom ${ts_save} ./generation/trajectory/trajectory_${usic}_${trial}.gen.custom type x y z ix iy iz
+dump_modify 1 first no sort id
+
+# Fix #
+fix 1 all momentum 1000 linear 1 1 1 angular
+
+variable T equal ${Temp}
+
+# Velocity # 
+velocity all create ${T} ${Vseed} mom yes rot yes dist gaussian
+
+fix 2 all nvt temp ${T} ${T} 100.0 #iso 1.0 1.0 1000.0
+
+# Thermo #
+thermo_style custom step temp press pe ke etotal epair lx ly lz xlo xhi ylo yhi zlo zhi vol density dt time 
+
+# Run stle #
+run_style verlet
+
+# Run #
+timestep ${ts}
+thermo ${ts_save}
+run ${steps_gen}
+
+# write restart #
+write_restart ${write_restart}
+
+

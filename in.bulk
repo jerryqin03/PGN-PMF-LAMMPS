@@ -1,0 +1,36 @@
+units metal
+dimension 3
+boundary p p p 
+atom_style atomic
+
+lattice bcc 5 orient x 1 0 0 orient y 0 1 0 orient z 0 0 1
+region bottom block 0 5 0 5 0 5
+create_box 1 bottom
+create_atoms 1 random 100 12345 bottom
+group mybox region bottom
+
+pair_style meam
+pair_coeff * * ../potentials/library.meam Fe NULL Fe
+
+thermo 100 
+thermo_style one
+
+minimize       1.0e-10 1.0e-10 100000 100000
+fix 2 mybox nvt temp 3000.0 3000.0 1.0 
+
+run 10000
+
+compute myRDF mybox rdf 50
+
+dump 1 all cfg 100 dumpbulk.tens_*.cfg mass type xs ys zs fx fy fz
+dump            2 all custom 500 bulk.dump id type xu yu zu
+dump_modify     2 sort id
+
+
+fix 1 mybox ave/time 100 1 21000 c_myRDF[*] file bulk.rdf mode vector
+
+
+run 20000
+
+
+

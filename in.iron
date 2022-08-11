@@ -1,0 +1,48 @@
+units metal
+dimension 3
+boundary p p p
+
+atom_style atomic
+
+variable velo equal ${vel}
+
+read_data iron.iron
+
+pair_style meam
+pair_coeff * * ../potentials/library.meam Fe NULL Fe
+
+region bottom block 0 40 0 40 0 5
+group film region bottom
+
+region myregion sphere 20 20 30 5 
+create_atoms 1 random 500 12345 myregion
+group bullet region myregion
+velocity bullet create 500 54321
+velocity bullet set 0 0 ${velo}
+
+#pair_style eam/fs
+#pair_coeff * * Fe_Earth_core.eam.fs
+#pair_coeff 1 1 Fe_Earth_core.eam.fs Fe
+
+neighbor	2.0 bin
+neigh_modify	delay 10
+
+compute p film pe/atom
+compute ctsm film centro/atom bcc
+compute myRDF film rdf 50
+
+fix 1 film nvt temp 2000 2000 0.1
+fix 2 bullet rigid group 1 bullet
+fix 3 film ave/time 100 1 100 c_myRDF[*] file tmp.rdf mode vector
+
+#variable srate equal 1.0e10
+#variable srate1 equal "v_srate / 1.0e11"
+#fix 2 all deform 1 x erate ${srate} units box remap x
+
+dump 1 all cfg 100 dumpexp.tens_*.cfg mass type xs ys zs c_p c_ctsm fx fy fz
+
+thermo 100 
+thermo_style one
+#thermo_modify lost ignore
+run 5000
+
