@@ -1,0 +1,22 @@
+tolerance 110
+output pgn-out-success.pdb
+
+filetype pdb
+
+seed 13546
+
+structure Ap.pdb
+    number 500
+    inside cube 0. 0. 0. 5000
+    radius 55
+end structure
+
+structure Pg.pdb
+    number 500
+    inside cube 0. 0. 0. 5000
+    radius 85
+end structure
+
+
+
+

@@ -1,0 +1,261 @@
+LAMMPS (23 Jun 2022 - Update 1)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+# Read restart
+read_restart ${read_res}
+read_restart ./pgnpmf/010/equpmf55.res
+Reading restart file ...
+  restart file = 23 Jun 2022, LAMMPS = 23 Jun 2022
+  restoring atom style atomic from restart
+  orthogonal box = (1333.0311 1333.0311 1333.0311) to (2666.9689 2666.9689 2666.9689)
+  1 by 2 by 2 MPI processor grid
+  restoring pair style table from restart
+  1000 atoms
+  read_restart CPU = 0.007 seconds
+
+# Settings
+
+pair_style table spline 9941
+
+pair_coeff 1 1 ./pgnpmf/N20.txt DE_GNP 75.6
+pair_coeff 2 2 ./pgnpmf/N100.txt DE_GNP 115.92
+WARNING: 3 of 9941 force values in table DE_GNP are inconsistent with -dE/dr.
+WARNING:  Should only be flagged at inflection points (src/pair_table.cpp:463)
+pair_coeff 1 2 ./pgnpmf/mixed_potential.txt DE_GNP 95.66
+WARNING: 1562 of 9941 force values in table DE_GNP are inconsistent with -dE/dr.
+WARNING:  Should only be flagged at inflection points (src/pair_table.cpp:463)
+
+#Neigh_list Calc Frequency
+
+neigh_modify delay 0 every 1 check yes
+
+# Saving Frequency (50 frames)
+
+variable ts_save equal ${steps_equ}
+variable ts_save equal 5000
+
+variable nts equal ${steps_equ}/${ts}
+variable nts equal 5000/${ts}
+variable nts equal 5000/0.5
+variable medium equal ${nts}*3
+variable medium equal 10000*3
+variable long equal ${nts}*5
+variable long equal 10000*5
+
+# Dump
+#dump 1 all custom ${ts_save} ./pgnpmf/${folder}/equilibration/trajectory/trajectory_${usic}_${trial}.equ.custom type x y z ix iy iz
+#dump_modify 1 first no sort id
+dump 2 all cfg 50000 ./pgnpmf/${folder}/equilibration/trajectory/dumpequ.tens_*.cfg mass type xs ys zs fx fy fz
+dump 2 all cfg 50000 ./pgnpmf/010/equilibration/trajectory/dumpequ.tens_*.cfg mass type xs ys zs fx fy fz
+dump_modify 2 element N20 N100
+
+# thermo_style
+thermo_style custom step temp press pe density ke etotal lx ly lz xlo xhi ylo yhi zlo zhi vol dt time cpu tpcpu spcpu cpuremain
+
+# run info
+timestep ${ts}
+timestep 0.5
+thermo 5000
+
+# fix
+
+fix 1 all momentum 1000 linear 1 1 1 angular
+variable T equal ${temp}
+variable T equal 300
+fix 2 all nvt temp ${T} 370000 100.0
+fix 2 all nvt temp 300 370000 100.0
+
+run ${nts}
+run 10000
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Unused restart file global fix info:
+  fix style: npt, fix ID: 5
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 117.92
+  ghost atom cutoff = 117.92
+  binsize = 58.96, bins = 23 23 23
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair table, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 3.089 | 3.096 | 3.101 Mbytes
+   Step          Temp          Press          PotEng        Density         KinEng         TotEng           Lx             Ly             Lz            Xlo            Xhi            Ylo            Yhi            Zlo            Zhi           Volume           Dt            Time           CPU           T/CPU          S/CPU         CPULeft    
+   5560000   366.20448      1.1661019     -44585888       0.29526182     1090.4944     -44584798       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2810000        0              0              0              0            
+   5565000   188529.91     -80.533633     -44793128       0.29526182     561409.87     -44231718       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2812500        0.51963338     4811.0792      9622.145       0.51963542   
+   5570000   365761.91     -2.7975978     -44590106       0.29526182     1089176.5     -43500930       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2815000        1.0375143      4827.3647      9654.7285      0            
+Loop time of 1.0376 on 4 procs for 10000 steps with 1000 atoms
+
+Performance: 416.347 ns/day, 0.058 hours/ns, 9637.663 timesteps/s
+99.5% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.029365   | 0.24297    | 0.67433    |  51.3 | 23.42
+Neigh   | 0.0003024  | 0.0016725  | 0.0043604  |   3.9 |  0.16
+Comm    | 0.22863    | 0.64216    | 0.83925    |  30.1 | 61.89
+Output  | 8.0757e-05 | 9.1842e-05 | 0.0001228  |   0.0 |  0.01
+Modify  | 0.073627   | 0.092473   | 0.099618   |   3.6 |  8.91
+Other   |            | 0.05823    |            |       |  5.61
+
+Nlocal:            250 ave         634 max          47 min
+Histogram: 1 1 1 0 0 0 0 0 0 1
+Nghost:          395.5 ave         532 max         241 min
+Histogram: 1 0 0 0 0 2 0 0 0 1
+Neighs:        1248.75 ave        3492 max         141 min
+Histogram: 1 2 0 0 0 0 0 0 0 1
+
+Total # of neighbors = 4995
+Ave neighs/atom = 4.995
+Neighbor list builds = 12
+Dangerous builds = 0
+
+unfix 2
+
+fix 3 all nvt temp 370000 370000 $(100.0*dt) #iso 1.0 1.0 $(1000.0*dt)
+fix 3 all nvt temp 370000 370000 50 
+
+run ${long}
+run 50000
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Per MPI rank memory allocation (min/avg/max) = 3.089 | 3.096 | 3.101 Mbytes
+   Step          Temp          Press          PotEng        Density         KinEng         TotEng           Lx             Ly             Lz            Xlo            Xhi            Ylo            Yhi            Zlo            Zhi           Volume           Dt            Time           CPU           T/CPU          S/CPU         CPULeft    
+   5570000   365761.91     -2.7975978     -44590106       0.29526182     1089176.5     -43500930       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2815000        0              0              0              0            
+   5575000   372088.09      83.715619     -44510094       0.29526182     1108014.8     -43402079       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2817500        0.55716939     4486.9618      8973.9126      5.0145414    
+   5580000   373051.38      80.513129     -44590609       0.29526182     1110883.3     -43479725       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2820000        1.0823183      4760.5539      9521.1063      4.3292814    
+   5585000   379519.97      84.987154     -44662262       0.29526182     1130145.7     -43532116       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2822500        1.5972997      4854.5441      9709.0896      3.7270372    
+   5590000   377364.97      64.697914     -44621944       0.29526182     1123728.5     -43498216       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2825000        2.0980021      4992.9843      9985.9669      3.1470065    
+   5595000   370433.81      64.257616     -44532583       0.29526182     1103088.6     -43429494       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2827500        2.599172       4988.3294      9976.6573      2.5991742    
+   5600000   352231.59      48.977628     -44497968       0.29526182     1048885.5     -43449082       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2830000        3.0993655      4998.0682      9996.1398      2.0662448    
+   5605000   374587.85      27.292401     -44406286       0.29526182     1115458.7     -43290828       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2832500        3.5954388      5039.5769      10079.153      1.5409031    
+   5610000   368957.73      15.646513     -44233504       0.29526182     1098693.1     -43134811       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2835000        4.0908246      5046.5707      10093.14       1.0227067    
+   5615000   364989.95      24.520489     -44112792       0.29526182     1086877.7     -43025914       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2837500        4.5858967      5049.7709      10099.543      0.50954429   
+   5620000   360357.66      0.54539377    -43883455       0.29526182     1073083.6     -42810372       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2840000        5.078208       5078.087       10156.173      0            
+Loop time of 5.07828 on 4 procs for 50000 steps with 1000 atoms
+
+Performance: 425.341 ns/day, 0.056 hours/ns, 9845.852 timesteps/s
+99.4% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.14412    | 1.191      | 3.2805     | 112.3 | 23.45
+Neigh   | 0.0019436  | 0.012758   | 0.03369    |  10.9 |  0.25
+Comm    | 1.1322     | 3.1467     | 4.1156     |  66.4 | 61.96
+Output  | 0.0042772  | 0.0043185  | 0.0044364  |   0.1 |  0.09
+Modify  | 0.35534    | 0.4453     | 0.47923    |   7.8 |  8.77
+Other   |            | 0.2782     |            |       |  5.48
+
+Nlocal:            250 ave         622 max          48 min
+Histogram: 1 1 1 0 0 0 0 0 0 1
+Nghost:          388.5 ave         532 max         235 min
+Histogram: 1 0 0 0 1 1 0 0 0 1
+Neighs:         1244.5 ave        3424 max         147 min
+Histogram: 1 2 0 0 0 0 0 0 0 1
+
+Total # of neighbors = 4978
+Ave neighs/atom = 4.978
+Neighbor list builds = 97
+Dangerous builds = 0
+
+unfix 3
+
+fix 4 all nvt temp 370000 ${T} 100.0
+fix 4 all nvt temp 370000 300 100.0
+
+run ${nts}
+run 10000
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Per MPI rank memory allocation (min/avg/max) = 4.378 | 4.385 | 4.39 Mbytes
+   Step          Temp          Press          PotEng        Density         KinEng         TotEng           Lx             Ly             Lz            Xlo            Xhi            Ylo            Yhi            Zlo            Zhi           Volume           Dt            Time           CPU           T/CPU          S/CPU         CPULeft    
+   5620000   360357.66      0.54539377    -43883455       0.29526182     1073083.6     -42810372       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2840000        0              0              0              0            
+   5625000   190601.39     -58.841321     -44073381       0.29526182     567578.4      -43505802       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2842500        0.48945644     5107.7021      10215.39       0.4894584    
+   5630000   9245.137      -145.39454     -44216098       0.29526182     27530.439     -44188567       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2845000        0.97857129     5111.2734      10222.542      0            
+Loop time of 0.978636 on 4 procs for 10000 steps with 1000 atoms
+
+Performance: 441.431 ns/day, 0.054 hours/ns, 10218.300 timesteps/s
+99.6% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.029368   | 0.234      | 0.63859    |  49.1 | 23.91
+Neigh   | 0.00023666 | 0.001554   | 0.0040761  |   3.8 |  0.16
+Comm    | 0.21343    | 0.60254    | 0.79204    |  29.3 | 61.57
+Output  | 7.2878e-05 | 8.0701e-05 | 0.00010257 |   0.0 |  0.01
+Modify  | 0.068042   | 0.085778   | 0.092847   |   3.5 |  8.77
+Other   |            | 0.05468    |            |       |  5.59
+
+Nlocal:            250 ave         623 max          48 min
+Histogram: 1 1 1 0 0 0 0 0 0 1
+Nghost:         389.75 ave         529 max         237 min
+Histogram: 1 0 0 0 0 2 0 0 0 1
+Neighs:        1238.75 ave        3409 max         147 min
+Histogram: 1 2 0 0 0 0 0 0 0 1
+
+Total # of neighbors = 4955
+Ave neighs/atom = 4.955
+Neighbor list builds = 12
+Dangerous builds = 0
+
+unfix 4
+
+fix 5 all npt temp ${T} ${T} $(100.0*dt) iso 1.0 1.0 $(1000.0*dt)
+fix 5 all npt temp 300 ${T} $(100.0*dt) iso 1.0 1.0 $(1000.0*dt)
+fix 5 all npt temp 300 300 $(100.0*dt) iso 1.0 1.0 $(1000.0*dt)
+fix 5 all npt temp 300 300 50 iso 1.0 1.0 $(1000.0*dt)
+fix 5 all npt temp 300 300 50 iso 1.0 1.0 500
+
+run ${medium}
+run 30000
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Per MPI rank memory allocation (min/avg/max) = 4.378 | 4.385 | 4.39 Mbytes
+   Step          Temp          Press          PotEng        Density         KinEng         TotEng           Lx             Ly             Lz            Xlo            Xhi            Ylo            Yhi            Zlo            Zhi           Volume           Dt            Time           CPU           T/CPU          S/CPU         CPULeft    
+   5630000   9245.137      -145.39454     -44216098       0.29526182     27530.439     -44188567       1333.9378      1333.9378      1333.9378      1333.0311      2666.9689      1333.0311      2666.9689      1333.0311      2666.9689      2.3735954e+09  0.5            2845000        0              0              0              0            
+   5635000   442.74524      1.0001216     -44669769       0.30358595     1318.4197     -44668450       1321.6327      1321.6327      1321.6327      1339.1837      2660.8163      1339.1837      2660.8163      1339.1837      2660.8163      2.308513e+09   0.5            2847500        0.59339186     4213.0635      8426.1165      2.9669694    
+   5640000   414.02108      0.79161218    -44746554       0.30427884     1232.8841     -44745321       1320.6287      1320.6287      1320.6287      1339.6856      2660.3144      1339.6856      2660.3144      1339.6856      2660.3144      2.3032561e+09  0.5            2850000        1.1720122      4320.6227      8641.2454      2.3440283    
+   5645000   394.90388      0.96736868    -44788610       0.30492201     1175.9563     -44787434       1319.6996      1319.6996      1319.6996      1340.1502      2659.8498      1340.1502      2659.8498      1340.1502      2659.8498      2.2983979e+09  0.5            2852500        1.7508074      4319.3168      8638.633       1.7508095    
+   5650000   381.56886      1.287229      -44841351       0.30552984     1136.2469     -44840214       1318.8238      1318.8238      1318.8238      1340.5881      2659.4119      1340.5881      2659.4119      1340.5881      2659.4119      2.2938254e+09  0.5            2855000        2.3312354      4307.1671      8614.3357      1.1656186    
+   5655000   371.88636      0.91005942    -44912982       0.30607276     1107.4141     -44911875       1318.0436      1318.0436      1318.0436      1340.9782      2659.0218      1340.9782      2659.0218      1340.9782      2659.0218      2.2897565e+09  0.5            2857500        2.9079911      4334.5903      8669.1789      0.58159866   
+   5660000   364.48353      1.1651289     -44967145       0.30659768     1085.3697     -44966060       1317.2909      1317.2909      1317.2909      1341.3545      2658.6455      1341.3545      2658.6455      1341.3545      2658.6455      2.2858363e+09  0.5            2860000        3.4857519      4327.0505      8654.1004      0            
+Loop time of 3.48582 on 4 procs for 30000 steps with 1000 atoms
+
+Performance: 371.792 ns/day, 0.065 hours/ns, 8606.302 timesteps/s
+99.7% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.11553    | 0.76235    | 2.0218     |  84.8 | 21.87
+Neigh   | 0.00090119 | 0.0067172  | 0.018025   |   8.1 |  0.19
+Comm    | 0.65698    | 1.8712     | 2.472      |  52.0 | 53.68
+Output  | 0.0028136  | 0.0028366  | 0.002903   |   0.1 |  0.08
+Modify  | 0.51054    | 0.57952    | 0.69909    |   9.6 | 16.63
+Other   |            | 0.2632     |            |       |  7.55
+
+Nlocal:            250 ave         622 max          48 min
+Histogram: 1 1 1 0 0 0 0 0 0 1
+Nghost:          396.5 ave         534 max         244 min
+Histogram: 1 0 0 0 0 2 0 0 0 1
+Neighs:           1256 ave        3447 max         147 min
+Histogram: 1 2 0 0 0 0 0 0 0 1
+
+Total # of neighbors = 5024
+Ave neighs/atom = 5.024
+Neighbor list builds = 53
+Dangerous builds = 27
+
+# run_style
+run_style verlet
+
+# write restart
+write_restart ${write_res}
+write_restart ./pgnpmf/010/equpmf56.res
+System init for write_restart ...
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+
+Total wall time: 0:00:10

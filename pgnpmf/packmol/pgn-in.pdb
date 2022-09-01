@@ -1,0 +1,13 @@
+tolerance 100
+output pgn-out.pdb
+
+filetype pdb
+
+structure pgn-20.pdb
+    number 500
+    inside cube 0. 0. 0. 1200
+end structure
+
+structure pgn-100.pdb
+    number 500 
+    inside cube 0. 0. 0. 1200

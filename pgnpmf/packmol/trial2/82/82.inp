@@ -1,0 +1,102 @@
+tolerance 55
+output 82.pdb
+
+filetype pdb
+
+seed 7163
+
+structure Ap.pdb
+    number 100
+    inside box 0. 0. 0. 2000 2000 2000
+    radius 55
+end structure
+
+structure Ap.pdb
+    number 100
+    inside box 2000 0. 0. 4000 2000 2000
+    radius 55
+end structure
+
+structure Ap.pdb
+    number 100
+    inside box 0. 2000 0. 2000 4000 2000
+    radius 55
+end structure
+
+structure Ap.pdb
+    number 100
+    inside box 0. 0. 2000 2000 2000 4000
+    radius 55
+end structure
+
+structure Ap.pdb
+    number 100
+    inside box 2000 2000 0. 4000 4000 2000
+    radius 55
+end structure
+
+structure Ap.pdb
+    number 100
+    inside box 2000 0. 2000 4000 2000 4000
+    radius 55
+end structure
+
+structure Ap.pdb
+    number 100
+    inside box 0. 2000 2000 2000 4000 4000
+    radius 55
+end structure
+
+structure Ap.pdb
+    number 100
+    inside box 2000 2000 2000 4000 4000 4000
+    radius 55
+end structure
+
+structure Pg.pdb
+    number 25
+    inside box 0. 0. 0. 2000 2000 2000
+    radius 55
+end structure
+
+structure Pg.pdb
+    number 25
+    inside box 2000 0. 0. 4000 2000 2000
+    radius 55
+end structure
+
+structure Pg.pdb
+    number 25
+    inside box 0. 2000 0. 2000 4000 2000
+    radius 55
+end structure
+
+structure Pg.pdb
+    number 25
+    inside box 0. 0. 2000 2000 2000 4000
+    radius 55
+end structure
+
+structure Pg.pdb
+    number 25
+    inside box 2000 2000 0. 4000 4000 2000
+    radius 55
+end structure
+
+structure Pg.pdb
+    number 25
+    inside box 2000 0. 2000 4000 2000 4000
+    radius 55
+end structure
+
+structure Pg.pdb
+    number 25
+    inside box 0. 2000 2000 2000 4000 4000
+    radius 55
+end structure
+
+structure Pg.pdb
+    number 25
+    inside box 2000 2000 2000 4000 4000 4000
+    radius 55
+end structure

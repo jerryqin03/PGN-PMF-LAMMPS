@@ -1,0 +1,176 @@
+--------------------------------------------------------------------------
+WARNING: There was an error initializing an OpenFabrics device.
+
+  Local host:   qnode0141
+  Local device: mlx5_0
+--------------------------------------------------------------------------
+LAMMPS (23 Jun 2022 - Update 1)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+Reading data file ...
+  orthogonal box = (-100 -100 -100) to (5100 5100 5100)
+  1 by 2 by 2 MPI processor grid
+  reading atoms ...
+  1000 atoms
+  read_data CPU = 0.014 seconds
+WARNING: 3 of 9941 force values in table DE_GNP are inconsistent with -dE/dr.
+WARNING:  Should only be flagged at inflection points (src/pair_table.cpp:463)
+WARNING: 1562 of 9941 force values in table DE_GNP are inconsistent with -dE/dr.
+WARNING:  Should only be flagged at inflection points (src/pair_table.cpp:463)
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 117.92
+  ghost atom cutoff = 117.92
+  binsize = 58.96, bins = 89 89 89
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair table, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Setting up Verlet run ...
+  Unit style    : real
+  Current step  : 0
+  Time step     : 1
+Per MPI rank memory allocation (min/avg/max) = 6.519 | 6.522 | 6.527 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   300           -60744.186      0             -59850.837     -0.0072934476 
+     10000   378460.1      -384296.77      0              742692.79      0.31828423   
+Loop time of 0.15636 on 4 procs for 10000 steps with 1000 atoms
+
+Performance: 5525.709 ns/day, 0.004 hours/ns, 63954.961 timesteps/s
+99.4% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.010088   | 0.011596   | 0.013421   |   1.2 |  7.42
+Neigh   | 0.0056919  | 0.0059246  | 0.0060461  |   0.2 |  3.79
+Comm    | 0.054254   | 0.058794   | 0.065105   |   1.6 | 37.60
+Output  | 0.0030729  | 0.0030762  | 0.0030855  |   0.0 |  1.97
+Modify  | 0.049175   | 0.056048   | 0.061488   |   2.0 | 35.85
+Other   |            | 0.02092    |            |       | 13.38
+
+Nlocal:            250 ave         266 max         216 min
+Histogram: 1 0 0 0 0 0 0 0 1 2
+Nghost:          93.75 ave         156 max          73 min
+Histogram: 3 0 0 0 0 0 0 0 0 1
+Neighs:             19 ave          31 max           6 min
+Histogram: 1 0 0 1 0 0 0 1 0 1
+
+Total # of neighbors = 76
+Ave neighs/atom = 0.076
+Neighbor list builds = 28
+Dangerous builds = 0
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Setting up Verlet run ...
+  Unit style    : real
+  Current step  : 10000
+  Time step     : 1
+Per MPI rank memory allocation (min/avg/max) = 6.521 | 6.524 | 6.529 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+     10000   378460.1      -384296.77      0              742692.79      0.31828423   
+[qnode0141:395339] 3 more processes have sent help message help-mpi-btl-openib.txt / error in device init
+[qnode0141:395339] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+    510000   369126.15     -1157859.6      0             -58664.915      0.29402583   
+Loop time of 9.05387 on 4 procs for 500000 steps with 1000 atoms
+
+Performance: 4771.441 ns/day, 0.005 hours/ns, 55225.015 timesteps/s
+99.4% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.5588     | 1.1292     | 1.5436     |  34.0 | 12.47
+Neigh   | 0.39156    | 0.41379    | 0.43826    |   2.6 |  4.57
+Comm    | 2.8917     | 3.3679     | 3.9423     |  20.6 | 37.20
+Output  | 0.16683    | 0.17359    | 0.19167    |   2.5 |  1.92
+Modify  | 2.5917     | 2.7789     | 3.0229     |   9.3 | 30.69
+Other   |            | 1.19       |            |       | 13.15
+
+Nlocal:            250 ave         319 max         202 min
+Histogram: 1 0 1 1 0 0 0 0 0 1
+Nghost:             70 ave          87 max          56 min
+Histogram: 2 0 0 0 0 0 0 0 1 1
+Neighs:          36.25 ave          80 max           8 min
+Histogram: 1 1 0 1 0 0 0 0 0 1
+
+Total # of neighbors = 145
+Ave neighs/atom = 0.145
+Neighbor list builds = 1977
+Dangerous builds = 0
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Setting up Verlet run ...
+  Unit style    : real
+  Current step  : 510000
+  Time step     : 1
+Per MPI rank memory allocation (min/avg/max) = 6.529 | 6.532 | 6.537 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+    510000   369126.15     -1157859.6      0             -58664.915      0.29402583   
+   1010000   3639848.2     -215292.45      0              10623554       3.5241826    
+Loop time of 8.8155 on 4 procs for 500000 steps with 1000 atoms
+
+Performance: 4900.458 ns/day, 0.005 hours/ns, 56718.270 timesteps/s
+99.5% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.52042    | 0.76163    | 1.0704     |  22.7 |  8.64
+Neigh   | 0.95922    | 0.99794    | 1.0471     |   3.2 | 11.32
+Comm    | 2.7066     | 3.0315     | 3.2414     |  11.4 | 34.39
+Output  | 0.11649    | 0.12268    | 0.13926    |   2.7 |  1.39
+Modify  | 2.6623     | 2.7681     | 2.9214     |   5.8 | 31.40
+Other   |            | 1.134      |            |       | 12.86
+
+Nlocal:            250 ave         285 max         232 min
+Histogram: 2 0 0 1 0 0 0 0 0 1
+Nghost:          71.25 ave          74 max          67 min
+Histogram: 1 0 0 0 0 0 0 2 0 1
+Neighs:           6.75 ave          12 max           3 min
+Histogram: 1 1 0 0 0 1 0 0 0 1
+
+Total # of neighbors = 27
+Ave neighs/atom = 0.027
+Neighbor list builds = 4837
+Dangerous builds = 0
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Setting up Verlet run ...
+  Unit style    : real
+  Current step  : 1010000
+  Time step     : 1
+Per MPI rank memory allocation (min/avg/max) = 6.53 | 6.532 | 6.537 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+   1010000   3639848.2     -215292.45      0              10623554       3.5241826    
+   1020000   35929.099     -229731.45      0             -122740.73      0.018722333  
+Loop time of 0.162041 on 4 procs for 10000 steps with 1000 atoms
+
+Performance: 5331.972 ns/day, 0.005 hours/ns, 61712.635 timesteps/s
+99.2% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.010998   | 0.012872   | 0.015252   |   1.4 |  7.94
+Neigh   | 0.018386   | 0.018751   | 0.019536   |   0.3 | 11.57
+Comm    | 0.050987   | 0.053239   | 0.054147   |   0.6 | 32.85
+Output  | 0.002225   | 0.0022286  | 0.0022388  |   0.0 |  1.38
+Modify  | 0.052778   | 0.054444   | 0.056057   |   0.5 | 33.60
+Other   |            | 0.02051    |            |       | 12.66
+
+Nlocal:            250 ave         287 max         233 min
+Histogram: 2 0 1 0 0 0 0 0 0 1
+Nghost:          68.25 ave          76 max          63 min
+Histogram: 1 0 1 1 0 0 0 0 0 1
+Neighs:           7.75 ave          14 max           3 min
+Histogram: 1 1 0 0 0 1 0 0 0 1
+
+Total # of neighbors = 31
+Ave neighs/atom = 0.031
+Neighbor list builds = 91
+Dangerous builds = 0
+System init for write_restart ...
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Total wall time: 0:00:18

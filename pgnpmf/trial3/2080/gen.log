@@ -1,0 +1,239 @@
+LAMMPS (23 Jun 2022 - Update 1)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+
+# Init #
+dimension   3
+boundary    p p p
+units       real
+atom_style  atomic
+
+# Atom Definition #
+read_data ${input_data}
+read_data ./pgnpmf/2080/dat2080.dat
+Reading data file ...
+  orthogonal box = (-100 -100 -100) to (4100 4100 4100)
+  1 by 2 by 2 MPI processor grid
+  reading atoms ...
+  1000 atoms
+  read_data CPU = 0.016 seconds
+
+# Settings #
+pair_style table spline 9941
+
+pair_coeff 1 1 ./pgnpmf/N20.txt DE_GNP 75.6
+pair_coeff 2 2 ./pgnpmf/N100.txt DE_GNP 115.92
+WARNING: 3 of 9941 force values in table DE_GNP are inconsistent with -dE/dr.
+WARNING:  Should only be flagged at inflection points (src/pair_table.cpp:463)
+pair_coeff 1 2 ./pgnpmf/mixed_potential.txt DE_GNP 95.66
+WARNING: 1562 of 9941 force values in table DE_GNP are inconsistent with -dE/dr.
+WARNING:  Should only be flagged at inflection points (src/pair_table.cpp:463)
+
+# Neighbor list calc frequency #
+neigh_modify delay 0 every 1 check yes
+
+# Saving frequency #
+variable ts_save equal floor(${steps_gen}*0.01)
+variable ts_save equal floor(5000*0.01)
+
+# Dump #
+dump 1 all custom 10000 ./pgnpmf/${folder}/generation/trajectory/trajectory_${usic}_${trial}.gen.custom type x y z ix iy iz
+dump 1 all custom 10000 ./pgnpmf/2080/generation/trajectory/trajectory_${usic}_${trial}.gen.custom type x y z ix iy iz
+dump 1 all custom 10000 ./pgnpmf/2080/generation/trajectory/trajectory_1_${trial}.gen.custom type x y z ix iy iz
+dump 1 all custom 10000 ./pgnpmf/2080/generation/trajectory/trajectory_1_1.gen.custom type x y z ix iy iz
+dump_modify 1 first no sort id
+dump 2 all cfg 10000 ./pgnpmf/${folder}/generation/trajectory/dumpgen.tens_*.cfg mass type xs ys zs fx fy fz
+dump 2 all cfg 10000 ./pgnpmf/2080/generation/trajectory/dumpgen.tens_*.cfg mass type xs ys zs fx fy fz
+dump_modify 2 element N20 N100
+
+# Fix #
+fix 1 all momentum 1000 linear 1 1 1 angular
+
+variable T equal ${Temp}
+variable T equal 300
+
+# Velocity #
+velocity all create ${T} ${Vseed} mom yes rot yes dist gaussian
+velocity all create 300 ${Vseed} mom yes rot yes dist gaussian
+velocity all create 300 57138 mom yes rot yes dist gaussian
+
+fix 2 all nvt temp ${T} 370000 100.0 #iso 1.0 1.0 1000.0
+fix 2 all nvt temp 300 370000 100.0 
+run ${steps_gen}
+run 5000
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 117.92
+  ghost atom cutoff = 117.92
+  binsize = 58.96, bins = 72 72 72
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair table, perpetual
+      attributes: half, newton on
+      pair build: half/bin/atomonly/newton
+      stencil: half/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 6.141 | 6.144 | 6.146 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+         0   300            0              0              893.34877      0.00055119596
+      5000   357461.66     -37146.833      0              1027313        0.64771049   
+Loop time of 0.15758 on 4 procs for 5000 steps with 1000 atoms
+
+Performance: 2741.464 ns/day, 0.009 hours/ns, 31729.908 timesteps/s
+99.7% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.013225   | 0.01335    | 0.013572   |   0.1 |  8.47
+Neigh   | 0.0055234  | 0.0056074  | 0.0056908  |   0.1 |  3.56
+Comm    | 0.032182   | 0.034369   | 0.037311   |   1.0 | 21.81
+Output  | 4.8767e-05 | 5.9593e-05 | 9.076e-05  |   0.0 |  0.04
+Modify  | 0.073268   | 0.077591   | 0.081425   |   1.0 | 49.24
+Other   |            | 0.0266     |            |       | 16.88
+
+Nlocal:            250 ave         250 max         250 min
+Histogram: 4 0 0 0 0 0 0 0 0 0
+Nghost:          15.25 ave          22 max           7 min
+Histogram: 1 0 0 0 0 1 1 0 0 1
+Neighs:              3 ave           5 max           2 min
+Histogram: 2 0 0 1 0 0 0 0 0 1
+
+Total # of neighbors = 12
+Ave neighs/atom = 0.012
+Neighbor list builds = 13
+Dangerous builds = 0
+
+unfix 2
+
+fix 3 all nvt temp 370000 370000 100.0
+run 500000
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Per MPI rank memory allocation (min/avg/max) = 6.141 | 6.144 | 6.146 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+      5000   357461.66     -37146.833      0              1027313        0.64771049   
+    505000   357819.74     -1201955.7      0             -136429.64      0.61412913   
+Loop time of 22.5356 on 4 procs for 500000 steps with 1000 atoms
+
+Performance: 1916.967 ns/day, 0.013 hours/ns, 22187.116 timesteps/s
+99.4% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 2.8001     | 3.4814     | 4.3975     |  31.7 | 15.45
+Neigh   | 0.90177    | 0.93156    | 0.96027    |   2.1 |  4.13
+Comm    | 6.3337     | 7.2396     | 7.9229     |  22.5 | 32.13
+Output  | 0.34294    | 0.35478    | 0.3812     |   2.6 |  1.57
+Modify  | 7.5036     | 7.7013     | 7.8915     |   5.0 | 34.17
+Other   |            | 2.827      |            |       | 12.54
+
+Nlocal:            250 ave         271 max         218 min
+Histogram: 1 0 0 0 0 0 1 1 0 1
+Nghost:             68 ave          71 max          64 min
+Histogram: 1 0 0 0 0 1 0 1 0 1
+Neighs:             40 ave          63 max          24 min
+Histogram: 1 1 0 0 1 0 0 0 0 1
+
+Total # of neighbors = 160
+Ave neighs/atom = 0.16
+Neighbor list builds = 2181
+Dangerous builds = 0
+
+unfix 3
+
+fix 4 all nvt temp 370000 3700000 $(100*dt)
+fix 4 all nvt temp 370000 3700000 100
+run 500000
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Per MPI rank memory allocation (min/avg/max) = 6.144 | 6.147 | 6.149 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+    505000   357819.74     -1201955.7      0             -136429.64      0.61412913   
+   1005000   3888878       -244453.77      0              11335961       7.2353509    
+Loop time of 23.1609 on 4 procs for 500000 steps with 1000 atoms
+
+Performance: 1865.213 ns/day, 0.013 hours/ns, 21588.118 timesteps/s
+99.5% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 2.0906     | 2.3398     | 2.6415     |  12.9 | 10.10
+Neigh   | 1.9467     | 1.9598     | 1.9711     |   0.6 |  8.46
+Comm    | 7.8225     | 8.1449     | 8.3551     |   6.9 | 35.17
+Output  | 0.26608    | 0.27875    | 0.30892    |   3.3 |  1.20
+Modify  | 7.4779     | 7.601      | 7.6668     |   2.6 | 32.82
+Other   |            | 2.837      |            |       | 12.25
+
+Nlocal:            250 ave         259 max         240 min
+Histogram: 1 0 0 1 0 0 0 1 0 1
+Nghost:          77.75 ave          80 max          74 min
+Histogram: 1 0 0 0 0 0 1 0 1 1
+Neighs:             10 ave          12 max           9 min
+Histogram: 2 0 0 1 0 0 0 0 0 1
+
+Total # of neighbors = 40
+Ave neighs/atom = 0.04
+Neighbor list builds = 4688
+Dangerous builds = 0
+
+unfix 4
+
+fix 5 all nvt temp 3700000 ${T} 100.0
+fix 5 all nvt temp 3700000 300 100.0
+run ${steps_gen}
+run 5000
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Per MPI rank memory allocation (min/avg/max) = 6.145 | 6.148 | 6.149 Mbytes
+   Step          Temp          E_pair         E_mol          TotEng         Press     
+   1005000   3888878       -244453.77      0              11335961       7.2353509    
+   1010000   70324.673     -254523.52      0             -45108.652      0.12325962   
+Loop time of 0.227784 on 4 procs for 5000 steps with 1000 atoms
+
+Performance: 1896.535 ns/day, 0.013 hours/ns, 21950.642 timesteps/s
+99.1% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.018757   | 0.019807   | 0.021389   |   0.8 |  8.70
+Neigh   | 0.016938   | 0.017138   | 0.017279   |   0.1 |  7.52
+Comm    | 0.077933   | 0.080359   | 0.082811   |   0.7 | 35.28
+Output  | 0.0064333  | 0.0064439  | 0.0064752  |   0.0 |  2.83
+Modify  | 0.073324   | 0.075298   | 0.077096   |   0.5 | 33.06
+Other   |            | 0.02874    |            |       | 12.62
+
+Nlocal:            250 ave         256 max         243 min
+Histogram: 1 0 1 0 0 0 0 0 0 2
+Nghost:             74 ave          76 max          71 min
+Histogram: 1 0 0 0 1 0 0 0 0 2
+Neighs:            9.5 ave          11 max           8 min
+Histogram: 1 0 0 1 0 0 1 0 0 1
+
+Total # of neighbors = 38
+Ave neighs/atom = 0.038
+Neighbor list builds = 41
+Dangerous builds = 0
+
+# Thermo #
+thermo_style custom step temp press pe ke etotal epair lx ly lz xlo xhi ylo yhi zlo zhi vol density dt time
+
+# Run stle #
+run_style verlet
+
+# Run #
+timestep ${ts}
+timestep 1
+thermo ${ts_save}
+thermo 50
+# run ${steps_gen}
+
+# write restart #
+write_restart ${write_restart}
+write_restart ./pgnpmf/2080/genpmf.res
+System init for write_restart ...
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+
+
+Total wall time: 0:00:46

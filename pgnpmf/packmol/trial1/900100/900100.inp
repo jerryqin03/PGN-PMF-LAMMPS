@@ -1,0 +1,18 @@
+tolerance 55
+output 900100.pdb
+
+filetype pdb
+
+seed 127836
+
+structure Ap.pdb
+    number 900
+    inside cube 0. 0. 0. 5000
+    radius 55
+end structure
+
+structure Pg.pdb
+    number 100
+    inside cube 0. 0. 0. 5000
+    radius 85
+end structure

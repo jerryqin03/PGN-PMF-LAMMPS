@@ -1,0 +1,9 @@
+LAMMPS (23 Jun 2022 - Update 1)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+# Read restart
+read_restart ${read_res}
+read_restart ./pgnpmf/0100/equpmf.res
+Reading restart file ...
+ERROR on proc 0: Cannot open restart file ./pgnpmf/0100/equpmf.res: No such file or directory (src/read_restart.cpp:112)
+Last command: read_restart ${read_res}

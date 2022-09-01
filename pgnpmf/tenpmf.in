@@ -1,0 +1,55 @@
+###
+
+# Read restart info
+read_restart ${read_res}
+
+# Settings 
+pair_style table/pgn spline 9941 
+pair_coeff 1 1 N20.txt DE_GNP 308 72.9   # 1.35 * r
+pair_coeff 2 2 N100.txt DE_GNP 473.9 111.78
+pair_coeff 1 2 mixed_potential.txt DE_GNP 391.2 92.95
+
+# Neighbor list
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check no once yes 
+
+# Temperature
+variable T equal ${Temp}
+
+# Deformation
+reset_timestep 0
+variable tmp equal "lx"
+variable L0 equal ${tmp}
+variable strain equal "(lx - v_L0)/v_L0"
+variable stp equal "step"
+variable tmpe equal "temp"
+variable p1 equal "v_strain"
+variable p2 equal "-pxx*1.01325/10000"
+variable p3 equal "-pyy*1.01325/10000"
+variable p4 equal "-pzz*1.01325/10000"
+variable p5 equal "lx"
+variable p6 equal "ly"
+variable p7 equal "lz"
+variable p8 equal "press"
+variable p9 equal "epair"
+variable p10 equal "etotal"
+
+# Thermo 
+thermo_style custom step temp v_p1 v_p2 v_p3 v_p4 press lx ly lz vol density epair pe ke etotal pxx pyy pzz pxy pxz pyz spcpu
+thermo ${ts_save}
+
+# Dump
+# dump 1 all custom 2000 ./${N20}${N100}/tensile/trajectory/trajectory_${usic}_${trial}_*.tensile.custom id type x y z ix iy iz
+# dump_modify 1 sort id
+dump 2 all cfg 20000 ./trial${trial}/${N20}${N100}/tensile/trajectory/dumpten.tens_${usic}_${trial}_*.cfg mass type xs ys zs fx fy fz
+dump_modify 2 element N20 N100
+
+fix 1 all nvt temp ${T} ${T} 100
+fix 2 all deform 1 x erate ${strain_rate} y erate ${strain_rate} z erate ${strain_rate} units box
+fix             def1 all print ${ts_save} "${p1} ${p2} ${p3} ${p4}" file ./tensile/tensile${N20}${N100}_${usic}_${trial}.txt screen no
+
+timestep       		${ts}
+run				${steps_tensile}
+
+# restart file 
+write_restart ./tensile/restart/restart_${usic}_${trial}.tensile.restart
