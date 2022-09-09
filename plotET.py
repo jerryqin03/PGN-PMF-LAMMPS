@@ -20,8 +20,8 @@ if sys.argv[2] == "T":
     comp = []
     T = []
 
-    for n in np.linspace(0, 10, 11, dtype=int):
-        with open ('tensile%s%s_1_%s.txt' % (n, 10-n, sys.argv[1])) as f:
+    for n in np.linspace(0, 100, 11, dtype=int):
+        with open ('tensile%s%s_1_%s.txt' % (n, 100-n, sys.argv[1])) as f:
             s = []
             e = []
             lines = f.readlines()[1:]
@@ -38,7 +38,7 @@ if sys.argv[2] == "T":
             snew = interpolate.splev(e[:28204], tck, der=0)
             Tint = integ(e[:28204], tck)
 
-            comp.append("%i" % (n*10))
+            comp.append("%i" % (n))
             T.append(Tint[-1])
         #plt.plot(e, Tint)
 
@@ -53,8 +53,8 @@ elif sys.argv[2] == "E":
     comp = []
     E = []
 
-    for n in np.linspace(0, 10, 11, dtype=int):
-        with open ('tensile%s%s_1_%s.txt' % (n, 10-n, sys.argv[1])) as f:
+    for n in np.linspace(0, 100, 11, dtype=int):
+        with open ('tensile%s%s_1_%s.txt' % (n, 100-n, sys.argv[1])) as f:
             s = []
             e = []
             lines = f.readlines()[1:]
@@ -69,7 +69,7 @@ elif sys.argv[2] == "E":
             tck = interpolate.splrep(e, s, s=0)
             #enew = np.arange(0, e[-1], len(e))
             snew = interpolate.splev(e, tck, der=1)
-            comp.append(n*10)
+            comp.append(n)
             E.append(snew[40])
     
     plt.plot(comp, E)

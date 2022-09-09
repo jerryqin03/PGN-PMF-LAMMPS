@@ -4,10 +4,10 @@
 read_restart ${read_res}
 
 # Settings 
-pair_style table/pgn spline 9941 
-pair_coeff 1 1 N20.txt DE_GNP 308 72.9   # 1.35 * r
-pair_coeff 2 2 N100.txt DE_GNP 473.9 111.78
-pair_coeff 1 2 mixed_potential.txt DE_GNP 391.2 92.95
+pair_style table/pgn spline 10941 
+pair_coeff 1 1 N20e.txt DE_GNP 308 72.9   # 1.35 * r
+pair_coeff 2 2 N100e.txt DE_GNP 473.9 111.78
+pair_coeff 1 2 mixed_potentiale.txt DE_GNP 391.2 92.95
 
 # Neighbor list
 neighbor 2.0 bin
@@ -41,15 +41,15 @@ thermo ${ts_save}
 # Dump
 # dump 1 all custom 2000 ./${N20}${N100}/tensile/trajectory/trajectory_${usic}_${trial}_*.tensile.custom id type x y z ix iy iz
 # dump_modify 1 sort id
-dump 2 all cfg 20000 ./trial${trial}/${N20}${N100}/tensile/trajectory/dumpten.tens_${usic}_${trial}_*.cfg mass type xs ys zs fx fy fz
+dump 2 all cfg 50000 ./trial${trial}/${N20}${N100}/tensile/trajectory/dumpten.tens_${usic}_${trial}_*.cfg mass type xs ys zs fx fy fz
 dump_modify 2 element N20 N100
 
 fix 1 all nvt temp ${T} ${T} 100
 fix 2 all deform 1 x erate ${strain_rate} y erate ${strain_rate} z erate ${strain_rate} units box
-fix             def1 all print ${ts_save} "${p1} ${p2} ${p3} ${p4}" file ./tensile/tensile${N20}${N100}_${usic}_${trial}.txt screen no
+fix             def1 all print ${ts_save} "${p1} ${p2} ${p3} ${p4}" file ./tensile/${trial}/tensile${N20}${N100}_${usic}_${trial}.txt screen no
 
 timestep       		${ts}
 run				${steps_tensile}
 
 # restart file 
-write_restart ./tensile/restart/restart_${usic}_${trial}.tensile.restart
+write_restart ./trial${trial}/${N20}${N100}/tensile/restart/restart_${usic}_${trial}.tensile.restart

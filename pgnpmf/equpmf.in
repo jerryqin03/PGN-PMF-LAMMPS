@@ -3,11 +3,11 @@ read_restart ${read_res}
 
 # Settings
 
-pair_style table spline 9941
+pair_style table spline 10941
 
-pair_coeff 1 1 ./pgnpmf/N20.txt DE_GNP 75.6
-pair_coeff 2 2 ./pgnpmf/N100.txt DE_GNP 115.92
-pair_coeff 1 2 ./pgnpmf/mixed_potential.txt DE_GNP 95.66
+pair_coeff 1 1 ./pgnpmf/N20e.txt DE_GNP 75.6
+pair_coeff 2 2 ./pgnpmf/N100e.txt DE_GNP 115.92
+pair_coeff 1 2 ./pgnpmf/mixed_potentiale.txt DE_GNP 95.66
 
 #Neigh_list Calc Frequency
 
@@ -24,8 +24,8 @@ variable long equal ${nts}*5
 # Dump
 #dump 1 all custom ${ts_save} ./pgnpmf/${folder}/equilibration/trajectory/trajectory_${usic}_${trial}.equ.custom type x y z ix iy iz
 #dump_modify 1 first no sort id
-dump 2 all cfg 50000 ./pgnpmf/trial${trial}/${folder}/equilibration/trajectory/dumpequ.tens_*.cfg mass type xs ys zs fx fy fz
-dump_modify 2 element N20 N100
+#dump 2 all cfg 50000 ./pgnpmf/trial${trial}/${folder}/equilibration/trajectory/dumpequ.tens_*.cfg mass type xs ys zs fx fy fz
+#dump_modify 2 element N20 N100
 
 # thermo_style
 thermo_style custom step temp press pe density ke etotal lx ly lz xlo xhi ylo yhi zlo zhi vol dt time cpu tpcpu spcpu cpuremain
@@ -38,19 +38,19 @@ thermo 5000
 
 fix 1 all momentum 1000 linear 1 1 1 angular
 variable T equal ${temp}
-fix 2 all nvt temp ${T} 370000 100.0 
+fix 2 all nvt temp ${T} ${high} $(100.0*dt)
 
 run ${nts}
 
 unfix 2
 
-fix 3 all nvt temp 370000 370000 $(100.0*dt) #iso 1.0 1.0 $(1000.0*dt)
+fix 3 all nvt temp ${high} ${high} $(100.0*dt) #iso 1.0 1.0 $(1000.0*dt)
 
 run ${long}
 
 unfix 3
 
-fix 4 all nvt temp 370000 ${T} 100.0
+fix 4 all nvt temp ${high} ${T} $(100.0*dt)
 
 run ${nts}
 
