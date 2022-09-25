@@ -13,26 +13,14 @@ import random
 
 class system:
 
-    def __init__(self, atom_list : List[particle], box_dims : List[float]) -> None:
+    def __init__(self, atom_list : List[particle], box_dims : List[float], cutoff : float) -> None:
         avg = sum(box_dims)/2
         self.atom_list = [atom - (avg, avg, avg) for atom in atom_list]
         self.box_dims = [box_dims[0] - avg, box_dims[1] - avg]
-    
-
-    @classmethod
-    def fromdump(cls, path : str) -> system:
-        with open(path) as f:
-            lines = f.readlines()
-            bd = [float(lines[5].split()[0]), float(lines[5].split()[1])]
-            al = []
-            for line in lines[9:]:
-                al.append(particle.fromlist(line))
-            return system(al, bd)
-
-
-    def make_periodic(self) -> system:
+        
         atoms = (self.atom_list).copy()
-        dims = [3*self.box_dims[0], 3*self.box_dims[1]]
+        dims = [self.box_dims[0] - cutoff, self.box_dims[1] + cutoff]
+        print(dims)
         box_length = self.box_dims[1] - self.box_dims[0]
 
         for x in [-1, 0, 1]:
@@ -42,9 +30,39 @@ class system:
                         continue
                     for atom in self.atom_list:
                         new = atom - (x*box_length, y*box_length, z*box_length)
-                        atoms.append(new)
+                        if new.in_box(dims):
+                            atoms.append(new)
 
-        return system(atoms, dims)
+        self.periodic_atoms = atoms
+        
+    @classmethod
+    def fromdump(cls, path : str, cutoff : float) -> system:
+        with open(path) as f:
+            lines = f.readlines()
+            bd = [float(lines[5].split()[0]), float(lines[5].split()[1])]
+            al = []
+            for line in lines[9:]:
+                al.append(particle.fromlist(line))
+            return system(al, bd, cutoff)
+
+
+    def make_periodic(self, cutoff) -> None:
+        atoms = (self.atom_list).copy()
+        dims = [self.box_dims[0] - cutoff, self.box_dims[1] + cutoff]
+        box_length = self.box_dims[1] - self.box_dims[0]
+
+        for x in [-1, 0, 1]:
+            for y in [-1, 0, 1]:
+                for z in [-1, 0, 1]:
+                    if x == y == z == 0:
+                        continue
+                    for atom in self.atom_list:
+                        new = atom - (x*box_length, y*box_length, z*box_length)
+                        if new.in_box(dims):
+                            atoms.append(new)
+
+        setattr(self, "periodic_atoms", atoms)
+        
 
 
     def lbod_bins():
@@ -96,6 +114,11 @@ class system:
     def sphharm0(l, theta) -> float:
         return (math.sqrt((2*l+1)/(4*math.pi)) * system.legendre0(l, math.cos(theta)))
 
+    def sph4(c):
+        return (math.sqrt((2*4+1)/(4*math.pi)) * ((1/8)*(35*(c**2) - 30*(c) + 3)))
+
+    def sph6(c):
+        return (math.sqrt((2*6+1)/(4*math.pi)) * (1/16)*(231*(c**3) - 315*(c**2) + 105*(c) - 5))
 
 
     # use frued to find the 2D histogram of angles
@@ -106,12 +129,12 @@ class system:
     def qo(self, l : int, target : particle, cutoff : float) -> float:
         
         # periodic boundary conditions
-        periodic_atoms = self.make_periodic().atom_list
+        #periodic_atoms = self.periodic_atoms
         # final local bond order value
         qresult = 0
 
         # find list of neighbors within cutoff
-        neigh_i = target.neighbors(periodic_atoms, cutoff)    
+        neigh_i = target.neighbors(self.periodic_atoms, cutoff)    
             
         # outer loop of neighbors of i
         for neigh in range(1):#neigh_i:
@@ -124,7 +147,7 @@ class system:
             # loop over neighbors j
             for j in range(len(neigh_i)):
                 
-                neigh_j = neigh_i[j].neighbors(periodic_atoms, cutoff)
+                neigh_j = neigh_i[j].neighbors(self.periodic_atoms, cutoff)
                     
                 # loop over neighbors k
                 for k in range(len(neigh_j)):
@@ -157,6 +180,7 @@ class system:
 
                     # find delta jij' and spherical harmonic
                     djij = math.acos(ij.dot(ijp) / (ij.magnitude * ijp.magnitude))
+                    print(djij)
                     sphharm3 = system.sphharm0(l, djij)
 
                     # sum results
@@ -170,19 +194,23 @@ class system:
 
         return qresult
 
+
+
+
     def q(self, l : int, target : particle, cutoff : float) -> float:
         
         # periodic boundary conditions
-        periodic_atoms = self.make_periodic().atom_list
+        #periodic_atoms = self.make_periodic(cutoff).atom_list
         # final local bond order value
         qresult = 0
 
         # find list of neighbors within cutoff
-        neigh_i = target.neighbors(periodic_atoms, cutoff)
+        neigh_i = target.find_neighbors(self.atom_list, self.box_dims, cutoff)
+        print(len(neigh_i))
 
         for j in range(len(neigh_i)):
 
-            neigh_j = neigh_i[j].neighbors(periodic_atoms, cutoff)
+            neigh_j = neigh_i[j].find_neighbors(self.atom_list, self.box_dims, cutoff)
             
             # results of spherical harmonic summations
             sijk = 0
@@ -190,22 +218,35 @@ class system:
             sjij = 0
 
             for jp in range(len(neigh_i)):
-                ij = vector3D(target.position, neigh_i[j].position)
-                ijp = vector3D(target.position, neigh_i[jp].position)
+                neigh_jp = neigh_i[jp].find_neighbors(self.atom_list, self.box_dims, cutoff)
+
+                for jp2 in range(len(neigh_i)):
+                    #print(target.position, neigh_i[j].position, neigh_i[jp].position)
+                    ij = vector3D(target.position, neigh_i[jp].position)
+                    ijp = vector3D(target.position, neigh_i[jp2].position)
+                    costheta=ij.dot(ijp) / (ij.magnitude * ijp.magnitude)
+
 
                 # find delta jij' and spherical harmonic
-                djij = math.acos(ij.dot(ijp) / (ij.magnitude * ijp.magnitude))
-                sphharm3 = system.sphharm0(l, djij)
+                    djij = math.acos(np.float32(costheta))
+                
+                #print(target.position, neigh_i[j].position, neigh_i[jp].position, djij, math.cos(djij)**2)
+                    sphharm3 = system.sphharm0(l, djij)
 
                 # sum results
-                sjij += sphharm3
+                    sjij += sphharm3
 
-                for k in range(len(neigh_j)):
-                    #ij = vector3D(target.position, neigh_i[j].position)
-                    jk = vector3D(neigh_i[j].position, neigh_j[k].position)
-                        
+                for k in range(len(neigh_jp)):
+                    ij = vector3D(target.position, neigh_i[jp].position)
+                    jk = vector3D(neigh_i[jp].position, neigh_jp[k].position)
+
+                    #print(target.position, neigh_i[jp].position, neigh_jp[k].position) 
+                    #print(ij.dx, ij.dy, ij.dz)
+                    #print(jk.dx, jk.dy, jk.dz)
                     # find delta ijk and spherical harmonic
-                    dijk = math.acos(ij.dot(jk) / (ij.magnitude * jk.magnitude))
+                    cosijk = ij.dot(jk) / (ij.magnitude * jk.magnitude)
+                    
+                    dijk = math.acos(np.float32(cosijk))
                     sphharm = system.sphharm0(l, dijk)
                         
                     # sum results
@@ -217,23 +258,31 @@ class system:
                     jkp = vector3D(neigh_i[j].position, neigh_j[kp].position)
 
                     # find delta kjk' and spherical harmonic
-                    dkjk = math.acos(jk.dot(jkp) / (jk.magnitude * jkp.magnitude))
+                    coskjk = jk.dot(jkp) / (jk.magnitude * jkp.magnitude)
+
+                    dkjk = math.acos(np.float32(coskjk))
                     sphharm2 = system.sphharm0(l, dkjk)
 
                     # sum results
                     skjk += sphharm2                                                         
-            print(sijk, sjij, skjk)
-            qresult += abs(sijk)/(math.sqrt(abs(sjij)) * math.sqrt(abs(skjk)))
+            #print(sijk, sjij, skjk)
+            qresult += sijk/(math.sqrt(sjij) * math.sqrt(skjk))
+
+        if len(neigh_i) == 0:
+            return 0
 
         qresult /= len(neigh_i)
+        print(qresult)
 
-        return qresult
+        return (qresult)
                 
+
+
+
 
     def q_ave(self, l : int, target : particle, cutoff : float) -> float:
         
-        periodic_atoms = self.make_periodic().atom_list
-        nei = target.neighbors(periodic_atoms, cutoff)
+        nei = target.find_neighbors(self.atom_list, self.box_dims, cutoff)
         sum = self.q(l, target, cutoff)
 
         for j in nei:
@@ -246,7 +295,7 @@ class system:
     def plot_qave(self, num : int, pair : Tuple[int], cutoff : float):
         x = []
         y = []
-        ran = random.sample(range(0,1000), num)
+        ran = random.sample(range(0,500), num)
         for r in ran:
             x.append(self.q_ave(pair[0], self.atom_list[r], cutoff))
             y.append(self.q_ave(pair[1], self.atom_list[r], cutoff))
@@ -254,12 +303,6 @@ class system:
         plt.scatter(x,y)
         plt.xlabel("q%i" % (pair[0]))
         plt.ylabel("q%i" % (pair[1]))
-        plt.savefig("q4q6.png")
+        plt.show()
 
         
-
-
-        
-    
-
-
